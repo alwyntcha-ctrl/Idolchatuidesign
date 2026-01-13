@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { WelcomeScreen } from './components/WelcomeScreen';
+import { PreSurveyScreen, type PreSurveyData } from './components/PreSurveyScreen';
 import { IdolGenderSelection } from './components/IdolGenderSelection';
 import { IdolProfileScreen } from './components/IdolProfileScreen';
 import { ChatInterface } from './components/ChatInterface';
@@ -23,6 +24,7 @@ export default function App() {
     gender: '',
     consent: false,
   });
+  const [preSurveyData, setPreSurveyData] = useState<PreSurveyData | null>(null);
   const [idolType, setIdolType] = useState<IdolType>(null);
   const [idolGender, setIdolGender] = useState<IdolGender>(null);
   const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
@@ -38,20 +40,25 @@ export default function App() {
     setCurrentScreen(1);
   };
 
+  const handlePreSurveyNext = (data: PreSurveyData) => {
+    setPreSurveyData(data);
+    setCurrentScreen(2);
+  };
+
   const handleIdolGenderNext = (gender: IdolGender) => {
     setIdolGender(gender);
     // Randomly assign idol type
     const randomType: IdolType = Math.random() < 0.5 ? 'human' : 'virtual';
     setIdolType(randomType);
-    setCurrentScreen(2);
-  };
-
-  const handleProfileNext = () => {
     setCurrentScreen(3);
   };
 
-  const handleChatEnd = () => {
+  const handleProfileNext = () => {
     setCurrentScreen(4);
+  };
+
+  const handleChatEnd = () => {
+    setCurrentScreen(5);
   };
 
   const handleCompletion = () => {
@@ -86,9 +93,12 @@ export default function App() {
         <WelcomeScreen onNext={handleWelcomeNext} />
       )}
       {currentScreen === 1 && (
-        <IdolGenderSelection onNext={handleIdolGenderNext} onBack={handleBack} />
+        <PreSurveyScreen onNext={handlePreSurveyNext} onBack={handleBack} />
       )}
       {currentScreen === 2 && (
+        <IdolGenderSelection onNext={handleIdolGenderNext} onBack={handleBack} />
+      )}
+      {currentScreen === 3 && (
         <IdolProfileScreen 
           idolType={idolType} 
           idolGender={idolGender}
@@ -96,15 +106,16 @@ export default function App() {
           onBack={handleBack}
         />
       )}
-      {currentScreen === 3 && (
+      {currentScreen === 4 && (
         <ChatInterface 
           idolType={idolType} 
           idolGender={idolGender}
+          preSurveyData={preSurveyData}
           onEnd={handleChatEnd}
           onBack={handleBack}
         />
       )}
-      {currentScreen === 4 && (
+      {currentScreen === 5 && (
         <CompletionScreen onContinue={handleCompletion} onBack={handleBack} />
       )}
     </div>
